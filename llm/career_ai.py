@@ -1,9 +1,11 @@
+# llm/career_ai.py
+
 import json
 import re
 from openai import AzureOpenAI
 import os
 from dotenv import load_dotenv
-from prompts import SKILL_EXTRACTION_PROMPT, NEXT_ROLE_WITH_LINKS_PROMPT
+from .prompts import SKILL_EXTRACTION_PROMPT, NEXT_ROLE_WITH_LINKS_PROMPT
 
 load_dotenv()
 
@@ -17,10 +19,7 @@ DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
 
 
 def extract_skills(resume_text):
-    """
-    Extracts skills from resume text using AI.
-    Returns a comma-separated string.
-    """
+    """Extracts skills from a resume text"""
     prompt = SKILL_EXTRACTION_PROMPT + resume_text
     response = client.chat.completions.create(
         model=DEPLOYMENT_NAME,
@@ -34,9 +33,7 @@ def extract_skills(resume_text):
 
 
 def get_next_roles_with_links(skills_text, career_goal=None):
-    """
-    Returns AI suggested next roles with missing skills, 90-day plan, and links.
-    """
+    """Returns suggested roles with missing skills, links, and 90-day plan"""
     prompt_input = skills_text
     if career_goal:
         prompt_input += f"\nUser's career interest: {career_goal}"
@@ -53,10 +50,10 @@ def get_next_roles_with_links(skills_text, career_goal=None):
 
     raw_text = response.choices[0].message.content
 
-    # --- Safe JSON parsing ---
     try:
         result = json.loads(raw_text)
     except json.JSONDecodeError:
+        # Attempt to extract JSON from text
         match = re.search(r"(\{.*\})", raw_text, re.DOTALL)
         if match:
             try:
@@ -70,8 +67,6 @@ def get_next_roles_with_links(skills_text, career_goal=None):
 
 
 def chunk_plan(plan_steps, weeks=12):
-    """
-    Split learning steps into weekly chunks for 90-day plan.
-    """
+    """Chunks the 90-day learning plan into weekly steps"""
     week_size = max(1, len(plan_steps) // weeks)
     return [plan_steps[i:i + week_size] for i in range(0, len(plan_steps), week_size)]
