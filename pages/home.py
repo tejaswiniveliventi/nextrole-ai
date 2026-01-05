@@ -1,77 +1,84 @@
+# pages/home.py
+
 import streamlit as st
 from llm import extract_skills, get_next_roles_with_links
 from utils import extract_text_from_pdf
 
-ALL_SKILLS = [
-    "Python", "SQL", "Power BI", "Tableau", "Excel", "ETL", "Data Analysis",
-    "Machine Learning", "Deep Learning", "AWS", "Azure", "Leadership",
-    "Project Management", "Salesforce", "DAX", "Data Visualization"
-]
-
 def show_home_page():
-    st.title("NextRole AI 🚀")
-    st.write("Turn your resume into your next career opportunity")
-    st.markdown("---")
+    st.set_page_config(page_title="NextRole AI", page_icon="🚀", layout="wide")
 
-    st.write(
-        "**Problem:** Skills don’t clearly translate into career opportunities.\n"
-        "**Solution:** NextRole AI analyzes your resume or manually entered skills and recommends realistic next roles, "
-        "skill gaps, and a 90-day learning roadmap using AI."
-    )
+    st.title("NextRole AI 🚀")
+    st.write("Turn your resume into your next career opportunity.")
+
+    st.write("**Problem:** Skills don’t clearly translate into career opportunities.")
+    st.write("**Solution:** NextRole AI analyzes your resume and recommends realistic next roles, skill gaps, and a 90-day learning roadmap using AI.")
 
     # --- Resume Upload ---
     uploaded_file = st.file_uploader("Upload your resume (PDF)", type=["pdf"])
+
+    # --- Manual skill input ---
+    manual_skills = st.text_input("Or enter skills manually (comma separated)")
+
+    # --- Career goal ---
     career_goal = st.text_input("Career Interest (optional)")
 
-    resume_skills = ""
+    # Extract skills from resume or use manual
+    skills = ""
     if uploaded_file:
         resume_text = extract_text_from_pdf(uploaded_file)
-        with st.spinner("🔍 Extracting skills from resume..."):
-            resume_skills = extract_skills(resume_text)
-            resume_skills = ", ".join([s.strip() for s in resume_skills.split(",") if s.strip()])
+        try:
+            skills = extract_skills(resume_text)
+        except Exception as e:
+            st.error(f"Error extracting skills: {e}")
 
-    # --- Manual skill entry ---
-    st.write("### Or manually add your skills")
-    manual_skills = st.multiselect(
-        "Select or type your skills:",
-        options=ALL_SKILLS,
-        default=[],
-        help="Start typing to find skills or add your own"
-    )
-
-    # --- Combine skills ---
-    combined_skills_list = []
-    if resume_skills:
-        combined_skills_list += [s.strip() for s in resume_skills.split(",") if s.strip()]
     if manual_skills:
-        combined_skills_list += [s.strip() for s in manual_skills if s.strip()]
-    skills = ", ".join(sorted(set(combined_skills_list)))
+        # Merge with extracted skills if any
+        skills = ", ".join(filter(None, [skills, manual_skills]))
 
+    skills = ", ".join([s.strip() for s in skills.split(",") if s.strip()])
+
+    # Display extracted skills
     if skills:
-        st.write("**Your Skills:**")
+        st.write("**Extracted Skills:**")
         cols = st.columns(4)
-        for idx, skill in enumerate(skills.split(",")):
+        skill_list = [s.strip() for s in skills.split(",")]
+        for idx, skill in enumerate(skill_list):
             with cols[idx % 4]:
-                st.success(skill)
+                st.markdown(f"- {skill}")
 
-    # --- Generate suggested roles ---
+    # --- Next Role Suggestions ---
     if st.button("Find My Next Role"):
         if not skills:
-            st.warning("Please provide skills via resume upload or manual input.")
+            st.warning("Please upload a resume or enter skills manually.")
         else:
-            with st.spinner("🔍 Mapping your next roles..."):
-                result = get_next_roles_with_links(skills, career_goal)
+            with st.spinner("Mapping your next roles..."):
+                try:
+                    result = get_next_roles_with_links(skills, career_goal)
+                    if "error" in result:
+                        st.error(result["error"])
+                        return
 
-            if "error" in result:
-                st.error(result["error"])
-            else:
-                st.write("## Suggested Roles")
-                role_options = [role_info["role"] for role_info in result.get("suggested_roles", [])]
-
-                selected_role_name = st.selectbox("Pick a role to track your progress:", options=role_options)
-                if selected_role_name:
+                    st.write("## Suggested Roles")
                     for role_info in result.get("suggested_roles", []):
-                        if role_info["role"] == selected_role_name:
+                        st.subheader(role_info["role"])
+                        st.write("🎯 Why this fits you:")
+                        st.write(role_info["why_fit"])
+
+                        st.write("🧠 Skill gaps & learning resources:")
+                        for ms in role_info["missing_skills"]:
+                            st.write(f"- {ms['skill']} → [📚 Learn here]({ms['learning_link']})")
+
+                        st.write("🗓️ 90-Day Learning Plan:")
+                        for step in role_info["learning_plan_90_days"]:
+                            st.write("•", step)
+
+                        # Select a role to track progress
+                        if st.button(f"Track progress for {role_info['role']}",key=f"track_{role_info}"):
                             st.session_state["selected_role"] = role_info
+                            st.session_state["skills"] = skills
+                            st.session_state["career_goal"] = career_goal
                             st.session_state["page"] = "study_plan"
-                            st.experimental_rerun()
+                            st.rerun()
+                            #st.session_state["refresh_toggle"] = not st.session_state.get("refresh_toggle", False)
+                except Exception as e:
+                    st.error(f"Failed to get next roles: {e}")
