@@ -1,26 +1,34 @@
-# pages/study_plan.py
-
 import streamlit as st
 from llm.career_ai import chunk_plan
 
-def show_study_plan():
-    if "selected_role" not in st.session_state:
-        st.warning("Please select a role on the home page first.")
-        return
+st.title("📘 Study Plan")
 
-    role_info = st.session_state["selected_role"]
-    st.title(f"🗓️ Study Plan: {role_info['role']}")
+# ---------------- Guard ----------------
+if "selected_role" not in st.session_state:
+    st.warning("Please select a role first.")
+    st.stop()  # 🔑 Prevents loops
 
-    plan_chunks = chunk_plan(role_info["learning_plan_90_days"], weeks=12)
+role_info = st.session_state["selected_role"]
 
-    for week_idx, week_steps in enumerate(plan_chunks, start=1):
-        st.subheader(f"Week {week_idx}")
-        for step in week_steps:
-            st.write("•", step)
+st.header(role_info["role"])
 
-    st.write("### 🏆 Suggested Certifications / Learning Links")
-    for ms in role_info["missing_skills"]:
-        st.write(f"- {ms['skill']}: [📚 Learn here]({ms['learning_link']})")
+# ---------------- Weekly Plan ----------------
+plan_chunks = chunk_plan(
+    role_info["learning_plan_90_days"],
+    weeks=12
+)
 
-    if st.button("Back to Home"):
-        st.session_state["page"] = "home"
+for idx, steps in enumerate(plan_chunks, start=1):
+    #st.subheader(f"Phase {idx}")
+    for step in steps:
+        st.write("•", step)
+
+# ---------------- Skills & Resources ----------------
+st.subheader("🎓 Skills to Gain & Resources")
+
+for ms in role_info["missing_skills"]:
+    st.write(f"- **{ms['skill']}** → [Learn here]({ms['learning_link']})")
+
+# ---------------- Navigation ----------------
+if st.button("⬅ Back to Home"):
+    st.switch_page("pages/home.py")

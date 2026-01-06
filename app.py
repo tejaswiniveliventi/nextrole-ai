@@ -1,14 +1,28 @@
-# app.py
-
 import streamlit as st
-from pages import home, study_plan
 
-# Initialize page state
-if "page" not in st.session_state:
-    st.session_state["page"] = "home"
+st.set_page_config(
+    page_title="NextRole AI",
+    page_icon="🚀",
+    layout="wide"
+)
+
+# Define pages
+home_page = st.Page(
+    "pages/home.py",
+    title="Home"
+)
+
+study_plan_page = st.Page(
+    "pages/study_plan.py",
+    title="Study Plan"
+)
 
 # Navigation
-if st.session_state["page"] == "home":
-    home.show_home_page()
-elif st.session_state["page"] == "study_plan":
-    study_plan.show_study_plan()
+pg = st.navigation(
+    [
+        home_page,
+        study_plan_page
+    ]
+)
+
+pg.run()
