@@ -1,0 +1,73 @@
+# config.toml
+
+[app]
+title = "NextRole AI"
+icon = "🚀"
+layout = "wide"
+max_upload_mb = 10
+
+[home]
+title = "NextRole AI"
+subtitle = "Career progression powered by intelligent automation"
+
+upload_label = "Upload your resume (PDF, max 10MB)"
+manual_skill_label = "Or enter skills manually"
+career_goal_label = "Career interest (optional)"
+
+extracting_text = "Extracting skills from your profile"
+extraction_done = "Skill extraction completed"
+
+find_roles_button = "Find career paths"
+
+roles_header = "Recommended roles"
+
+study_button = "View study plan"
+
+
+[study_plan]
+title = "Learning roadmap"
+phase_header = "Phase {number}"
+
+[ui.colors]
+primary = "#4B0082"
+secondary = "#eef2ff"
+text = "#000000"
+
+[ui.fonts]
+role_name_size = 24
+header_size = 18
+subheader_size = 16
+
+[ui.skills_badge]
+background_color = "#eef2ff"
+font_size = 14
+padding = 8
+border_radius = 8
+columns = 4
+
+[server]
+max_upload_mb = 10
+[ui]
+app_title = "NextRole AI"
+app_icon = "🚀"
+
+home_title = "NextRole AI"
+home_subtitle = "Career intelligence that guides your next move."
+
+resume_upload_label = "Upload your resume (PDF, max 10MB)"
+manual_skills_label = "Or enter your skills manually"
+career_goal_label = "Career interest (optional)"
+
+extracting_skills_text = "Extracting skills"
+skills_ready_text = "Skills processed successfully"
+
+find_roles_button = "Find next roles"
+finding_roles_text = "Analyzing career paths"
+no_skills_warning = "Please upload a resume or enter skills"
+
+roles_header = "Suggested roles"
+select_role_button = "View study plan"
+
+study_plan_title = "Study plan for {role}"
+no_role_selected = "Please select a role first"
+back_button = "Back to home"

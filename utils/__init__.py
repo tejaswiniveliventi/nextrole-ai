@@ -1,2 +1,1 @@
-# Expose utility functions
 from .resume_parser import extract_text_from_pdf

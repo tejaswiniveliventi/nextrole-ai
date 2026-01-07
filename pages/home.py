@@ -1,51 +1,66 @@
 import streamlit as st
-from llm import extract_skills, get_next_roles_with_links
+from config_loader import load_config
+from llm import create_career_agent
 from utils import extract_text_from_pdf
 
-st.title("NextRole AI 🚀")
-st.write("Turn your resume into your next career opportunity.")
+config = load_config()
+agent = create_career_agent()
+def show_home():
+    st.title(config["ui"]["home_title"])
+    st.write(config["ui"]["home_subtitle"])
 
-# ---------------- Inputs ----------------
-uploaded_file = st.file_uploader("Upload your resume (PDF)", type=["pdf"])
-manual_skills = st.text_input("Or enter skills manually (comma separated)")
-career_goal = st.text_input("Career Interest (optional)")
+    uploaded_file = st.file_uploader(
+        config["ui"]["resume_upload_label"],
+        type=["pdf"]
+    )
 
-skills = ""
+    manual_skills = st.text_input(
+        config["ui"]["manual_skills_label"]
+    )
 
-# ---------------- Skill Extraction ----------------
-if uploaded_file:
-    resume_text = extract_text_from_pdf(uploaded_file)
-    skills = extract_skills(resume_text)
+    career_goal = st.text_input(
+        config["ui"]["career_goal_label"]
+    )
 
-if manual_skills:
-    skills = ", ".join(filter(None, [skills, manual_skills]))
+    skills = ""
 
-skills = ", ".join([s.strip() for s in skills.split(",") if s.strip()])
+    if uploaded_file:
+        with st.spinner(config["ui"]["extracting_skills_text"]):
+            resume_text = extract_text_from_pdf(uploaded_file)
+            skills = agent.llm.extract_skills(resume_text)
 
-if skills:
-    st.success(f"Skills detected: {skills}")
+    if manual_skills:
+        skills = manual_skills if not skills else skills + ", " + manual_skills
 
-# ---------------- Role Discovery ----------------
-if st.button("Find My Next Role"):
-    if not skills:
-        st.warning("Please upload a resume or enter skills.")
-    else:
-        with st.spinner("Finding best roles for you..."):
-            result = get_next_roles_with_links(skills, career_goal)
-            st.session_state["roles"] = result["suggested_roles"]
+    if skills:
+        st.success(config["ui"]["skills_ready_text"])
 
-# ---------------- Role Selection ----------------
-if "roles" in st.session_state:
-    st.subheader("Select a role to generate your study plan")
+    if st.button(config["ui"]["find_roles_button"]):
+        if not skills:
+            st.warning(config["ui"]["no_skills_warning"])
+            return
 
-    role_names = [r["role"] for r in st.session_state["roles"]]
-    selected_role_name = st.radio("Available roles", role_names)
+        with st.spinner(config["ui"]["finding_roles_text"]):
+            result = agent.analyze_profile(skills, career_goal)
+       # st.write(result)
+        roles = result.get("roles", [])
+        if not roles:
+            st.warning("No suitable roles found.")
+        else:
+            st.session_state["roles"] = roles
 
-    if st.button("Show Study Plan"):
-        selected_role = next(
-            r for r in st.session_state["roles"]
-            if r["role"] == selected_role_name
-        )
+    if "roles" in st.session_state:
+        st.subheader(config["ui"]["roles_header"])
 
-        st.session_state["selected_role"] = selected_role
-        st.switch_page("pages/study_plan.py")
+        for role in st.session_state["roles"]:
+            st.write(role["role"])
+            st.write(role["summary"])
+
+            if st.button(
+                config["ui"]["select_role_button"],
+                key=role["role"]
+            ):
+                st.session_state["selected_role"] = role
+                st.switch_page("pages/study_plan.py")
+
+show_home()

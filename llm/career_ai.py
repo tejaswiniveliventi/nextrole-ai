@@ -1,72 +1,101 @@
 # llm/career_ai.py
 
+import os
 import json
 import re
-from openai import AzureOpenAI
-import os
 from dotenv import load_dotenv
-from .prompts import SKILL_EXTRACTION_PROMPT, NEXT_ROLE_WITH_LINKS_PROMPT
+from openai import AzureOpenAI
+from .prompts import NEXT_ROLE_PROMPT, STUDY_PLAN_PROMPT, SKILL_EXTRACTION_PROMPT
 
+# Load environment variables
 load_dotenv()
 
+DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+AZURE_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+AZURE_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+
+# Initialize Azure OpenAI client
 client = AzureOpenAI(
-    api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+    api_key=AZURE_API_KEY,
+    azure_endpoint=AZURE_ENDPOINT,
     api_version="2024-02-01"
 )
 
-DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+
+class LLMClient:
+    """
+    LLM Client for making real calls to Azure OpenAI
+    """
+
+    def complete(self, prompt):
+        """
+        Calls the real LLM and returns parsed JSON
+        """
+        response = client.chat.completions.create(
+            model=DEPLOYMENT_NAME,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.4
+        )
+
+        raw_content = response.choices[0].message.content.strip()
+
+        # Attempt to parse JSON from response
+        try:
+            return json.loads(raw_content)
+        except json.JSONDecodeError:
+            # Fallback: extract JSON block from text
+            match = re.search(r"\{.*\}", raw_content, re.DOTALL)
+            if match:
+                try:
+                    return json.loads(match.group())
+                except json.JSONDecodeError:
+                    return {}
+            else:
+                return {}
+
+    def extract_skills(self, resume_text):
+        """
+        Extract skills from resume text using LLM
+        """
+        prompt = SKILL_EXTRACTION_PROMPT + resume_text
+        return self.complete(prompt)
 
 
-def extract_skills(resume_text):
-    """Extracts skills from a resume text"""
-    prompt = SKILL_EXTRACTION_PROMPT + resume_text
-    response = client.chat.completions.create(
-        model=DEPLOYMENT_NAME,
-        messages=[
-            {"role": "system", "content": "You are an AI that extracts professional skills."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0
-    )
-    return response.choices[0].message.content.strip()
+class CareerAgent:
+    """
+    Autonomous Career AI Agent
+    """
+
+    def __init__(self, llm_client):
+        self.llm = llm_client
+
+    def analyze_profile(self, skills, career_goal=None):
+        """
+        Returns next role suggestions as JSON
+        """
+        prompt = NEXT_ROLE_PROMPT.format(
+            skills=", ".join(skills),
+            career_goal=career_goal or "Not specified"
+        )
+        return self.llm.complete(prompt)
+
+    def decide_next_roles(self, analysis_result):
+        """
+        Extract suggested roles from LLM JSON
+        """
+        return analysis_result.get("suggested_roles", [])
+
+    def generate_study_plan(self, selected_role):
+        """
+        Generate a phase-wise study plan for a selected role
+        """
+        prompt = STUDY_PLAN_PROMPT.format(role=selected_role)
+        return self.llm.complete(prompt)
 
 
-def get_next_roles_with_links(skills_text, career_goal=None):
-    """Returns suggested roles with missing skills, links, and 90-day plan"""
-    prompt_input = skills_text
-    if career_goal:
-        prompt_input += f"\nUser's career interest: {career_goal}"
-
-    prompt = NEXT_ROLE_WITH_LINKS_PROMPT.format(skills=prompt_input)
-    response = client.chat.completions.create(
-        model=DEPLOYMENT_NAME,
-        messages=[
-            {"role": "system", "content": "You are a career advisor."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.4
-    )
-
-    raw_text = response.choices[0].message.content
-
-    try:
-        result = json.loads(raw_text)
-    except json.JSONDecodeError:
-        # Attempt to extract JSON from text
-        match = re.search(r"(\{.*\})", raw_text, re.DOTALL)
-        if match:
-            try:
-                result = json.loads(match.group(1))
-            except:
-                return {"error": "Failed to parse AI response."}
-        else:
-            return {"error": "Failed to parse AI response."}
-
-    return result
-
-
-def chunk_plan(plan_steps, weeks=12):
-    """Chunks the 90-day learning plan into weekly steps"""
-    week_size = max(1, len(plan_steps) // weeks)
-    return [plan_steps[i:i + week_size] for i in range(0, len(plan_steps), week_size)]
+def create_career_agent():
+    """
+    Factory method to initialize the career agent
+    """
+    llm_client = LLMClient()
+    return CareerAgent(llm_client)
