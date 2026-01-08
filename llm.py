@@ -75,3 +75,20 @@ def chunk_plan(plan_steps, weeks=12):
     """
     week_size = max(1, len(plan_steps) // weeks)
     return [plan_steps[i:i + week_size] for i in range(0, len(plan_steps), week_size)]
+
+
+def recommend_roles(extracted_skills):
+    # A simple mapping of skills to roles (this can be expanded)
+    role_mapping = {
+        "Python": ["Data Scientist", "Software Engineer"],
+        "Java": ["Java Developer", "Backend Engineer"],
+        "Machine Learning": ["Machine Learning Engineer", "Data Scientist"],
+        # Add more mappings as needed
+    }
+
+    recommended_roles = set()
+    for skill in extracted_skills:
+        if skill in role_mapping:
+            recommended_roles.update(role_mapping[skill])
+
+    return list(recommended_roles)  # Return unique recommended roles
