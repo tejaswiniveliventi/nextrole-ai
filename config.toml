@@ -1,72 +1,276 @@
-# config.toml
+# NextRole AI Configuration
+# Professional corporate styling and configuration
 
 [app]
 title = "NextRole AI"
-icon = "🚀"
+icon = "🎯"
 layout = "wide"
+maxUploadSize = 10
 max_upload_mb = 10
 
-[home]
-title = "NextRole AI"
-subtitle = "Career progression powered by intelligent automation"
-
-upload_label = "Upload your resume (PDF, max 10MB)"
-manual_skill_label = "Or enter skills manually"
-career_goal_label = "Career interest (optional)"
-
-extracting_text = "Extracting skills from your profile"
-extraction_done = "Skill extraction completed"
-
-find_roles_button = "Find career paths"
-
-roles_header = "Recommended roles"
-
-study_button = "View study plan"
-
-
-[study_plan]
-title = "Learning roadmap"
-phase_header = "Phase {number}"
-
-[ui.colors]
-primary = "#4B0082"
-secondary = "#eef2ff"
-text = "#000000"
-
-[ui.fonts]
-role_name_size = 24
-header_size = 18
-subheader_size = 16
-
-[ui.skills_badge]
-background_color = "#eef2ff"
-font_size = 14
-padding = 8
-border_radius = 8
-columns = 4
-
-[server]
-max_upload_mb = 10
 [ui]
-app_title = "NextRole AI"
-app_icon = "🚀"
-
+# Main titles and messaging
+app_title = "NextRole AI — Career Intelligence Platform"
+app_icon = "🎯"
 home_title = "NextRole AI"
-home_subtitle = "Career intelligence that guides your next move."
+home_subtitle = "Intelligent career pathway planning powered by AI"
 
-resume_upload_label = "Upload your resume (PDF, max 10MB)"
-manual_skills_label = "Or enter your skills manually"
-career_goal_label = "Career interest (optional)"
+# Form labels
+resume_upload_label = "📄 Upload Your Resume"
+manual_skills_label = "Or Add Skills Manually"
+career_goal_label = "Target Career Path (Optional)"
+experience_level_label = "Experience Level"
+current_role_label = "Current Role (Optional)"
 
-extracting_skills_text = "Extracting skills"
-skills_ready_text = "Skills processed successfully"
+# Button and action labels
+find_roles_button = "Discover Career Pathways"
+finding_roles_text = "Analyzing your profile..."
+select_role_button = "View Personalized Learning Plan"
+back_button = "← Return to Assessment"
 
-find_roles_button = "Find next roles"
-finding_roles_text = "Analyzing career paths"
-no_skills_warning = "Please upload a resume or enter skills"
+# Status and feedback messages
+extracting_skills_text = "Processing resume..."
+skills_ready_text = "✓ Profile processed successfully"
+no_skills_warning = "⚠️ Please upload a resume or enter skills to continue"
+no_role_selected = "Please select a role to view the learning plan"
 
-roles_header = "Suggested roles"
-select_role_button = "View study plan"
+# Headers and sections
+roles_header = "Recommended Career Pathways"
+study_plan_title = "Learning Roadmap for {role}"
+
+# Study plan phase labeling
+[study_plan]
+phase_header = "Phase {number}"
+duration_label = "Duration"
+skills_label = "Key Skills"
+deliverable_label = "Deliverable"
+
+# Professional color palette - Corporate Blue + Modern Accents
+[ui.colors]
+primary = "#1E3A8A"           # Deep professional blue
+secondary = "#0EA5E9"         # Bright accent blue
+accent = "#10B981"            # Emerald green for success
+warning = "#F59E0B"           # Amber for caution
+danger = "#EF4444"            # Red for errors
+background = "#F8FAFC"        # Light slate background
+card_background = "#FFFFFF"   # Clean white
+text_primary = "#1E293B"      # Dark slate for text
+text_secondary = "#64748B"    # Medium slate for secondary text
+border = "#E2E8F0"            # Light border color
+success = "#10B981"           # Success green
+
+# Typography
+[ui.typography]
+main_header_size = 32
+subheader_size = 24
+section_header_size = 20
+body_size = 16
+caption_size = 12
+role_card_header_size = 20
+
+# Skills badge styling
+[ui.skills_badge]
+background_color = "#EFF6FF"  # Light blue background
+border_color = "#0EA5E9"      # Blue border
+font_size = 13
+padding = 10
+border_radius = 6
+columns = 5
+
+# Card styling for roles
+[ui.role_card]
+background_color = "#FFFFFF"
+border_color = "#E2E8F0"
+border_width = 1
+border_radius = 8
+padding = 20
+shadow = true
+
+# Phase styling
+[ui.phase_card]
+background_color = "#F8FAFC"
+border_left_color = "#0EA5E9"
+border_left_width = 4
+padding = 16
+border_radius = 6
+
+# ===== CSS STYLING =====
+[css]
+global = """
+:root {
+    --primary: {primary};
+    --secondary: {secondary};
+    --accent: {accent};
+    --background: {background};
+}
+
+.main {
+    background-color: {background};
+}
+
+.stTitle {
+    color: {primary};
+    font-size: {main_header_size}px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.stSubheader {
+    color: {primary};
+    font-weight: 600;
+}
+
+.intro-text {
+    color: {text_secondary};
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.section-card {
+    background-color: {card_background};
+    border: 1px solid {border};
+    border-radius: {role_border_radius}px;
+    padding: {role_padding}px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.input-label {
+    color: {text_primary};
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.skill-badge {
+    display: inline-block;
+    background-color: {badge_bg};
+    border: 1px solid {badge_border};
+    color: {primary};
+    padding: {badge_padding}px {badge_padding_x}px;
+    border-radius: {badge_radius}px;
+    font-size: {badge_font}px;
+    font-weight: 500;
+    margin: 4px;
+}
+
+.skill-badge-missing {
+    background-color: #FEF3C7;
+    border-color: {warning};
+    color: #92400E;
+}
+
+.success-message {
+    background-color: #F0FDF4;
+    border-left: 4px solid {success};
+    padding: 12px 16px;
+    border-radius: 4px;
+    color: {success};
+}
+
+.phase-container {
+    background-color: {phase_bg};
+    border-left: {phase_border_width}px solid {phase_border_color};
+    padding: {phase_padding}px;
+    border-radius: {phase_radius}px;
+    margin: 20px 0;
+}
+
+.phase-header {
+    color: {primary};
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.phase-content {
+    color: {text_primary};
+    line-height: 1.8;
+}
+
+.deliverable-box {
+    background-color: #FFF3E0;
+    border-left: 4px solid {warning};
+    padding: 15px;
+    border-radius: 4px;
+    margin-top: 12px;
+}
+
+.role-header {
+    background: linear-gradient(135deg, {primary} 0%, {secondary} 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+"""
+
+# ===== HTML TEMPLATES =====
+[html]
+intro_header = """
+<div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;'>
+    <div>
+        <h1 style='color: {primary}; font-weight: 700; margin-bottom: 0;'>{title}</h1>
+        <p style='color: {text_secondary}; font-size: 18px; line-height: 1.6; margin-top: 10px;'>{subtitle}</p>
+    </div>
+</div>
+"""
+
+assessment_section = """
+<h3 style='color: {primary}; font-weight: 600; margin-bottom: 20px;'>📋 Assessment Details</h3>
+"""
+
+input_label_template = """
+<p style='color: {text_primary}; font-weight: 600; margin-bottom: 8px;'>{label}</p>
+"""
+
+skills_display = """
+<div style='margin: 15px 0;'>{skills_html}</div>
+"""
+
+success_box = """
+<div style='background-color: #F0FDF4; border-left: 4px solid {success}; padding: 12px 16px; border-radius: 4px; color: {success}; margin: 15px 0;'>
+    {message}
+</div>
+"""
+
+roles_section = """
+<h2 style='color: {primary}; font-weight: 700; margin-bottom: 20px;'>{header}</h2>
+"""
+
+role_card = """
+<div style='background-color: {card_bg}; border: 1px solid {border}; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);'>
+    <h3 style='color: {primary}; font-size: 20px; font-weight: 600; margin-bottom: 10px;'>{role_name}</h3>
+    <p style='color: {text_primary}; margin-bottom: 15px;'>{summary}</p>
+    {required_skills_html}
+    {missing_skills_html}
+</div>
+"""
+
+role_header_gradient = """
+<div style='background: linear-gradient(135deg, {primary} 0%, {secondary} 100%); color: white; padding: 30px; border-radius: 8px; margin-bottom: 30px;'>
+    <h1 style='margin: 0; color: white;'>{role_name}</h1>
+    <p style='margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 18px;'>{summary}</p>
+</div>
+"""
+
+phase_block = """
+<div style='background-color: {phase_bg}; border-left: {phase_border_width}px solid {phase_border_color}; padding: {phase_padding}px; border-radius: {phase_radius}px; margin: 20px 0;'>
+    <div style='color: {primary}; font-size: 20px; font-weight: 600; margin-bottom: 15px;'>{header}</div>
+    {content}
+</div>
+"""
+
+deliverable_item = """
+<div style='background-color: #FFF3E0; border-left: 4px solid {warning}; padding: 15px; border-radius: 4px; margin-top: 12px;'>
+    <strong>🎯 Deliverable:</strong> {deliverable}
+</div>
+"""
+
+skill_badge_template = """
+<span style='display: inline-block; background-color: {bg_color}; border: 1px solid {border_color}; color: {text_color}; padding: {padding}px {padding_x}px; border-radius: {radius}px; font-size: {font_size}px; font-weight: 500; margin: 4px;'>{skill}</span>
+"""
+
 
 study_plan_title = "Study plan for {role}"
 no_role_selected = "Please select a role first"
