@@ -47,17 +47,19 @@ deliverable_label = "Deliverable"
 
 # Professional color palette - Corporate Blue + Modern Accents
 [ui.colors]
-primary = "#1E3A8A"           # Deep professional blue
-secondary = "#0EA5E9"         # Bright accent blue
-accent = "#10B981"            # Emerald green for success
-warning = "#F59E0B"           # Amber for caution
-danger = "#EF4444"            # Red for errors
-background = "#F8FAFC"        # Light slate background
-card_background = "#FFFFFF"   # Clean white
-text_primary = "#1E293B"      # Dark slate for text
-text_secondary = "#64748B"    # Medium slate for secondary text
-border = "#E2E8F0"            # Light border color
-success = "#10B981"           # Success green
+primary = "#1E3A8A"             # Deep professional blue
+secondary = "#0EA5E9"           # Bright accent blue
+accent = "#10B981"              # Emerald green for success
+warning = "#F59E0B"             # Amber for caution
+danger = "#EF4444"              # Red for errors
+background = "#F8FAFC"          # Light slate background
+card_background = "#FFFFFF"     # Clean white
+text_primary = "#1E293B"        # Dark slate for text
+text_secondary = "#64748B"      # Medium slate for secondary text
+border = "#E2E8F0"              # Light border color
+success = "#10B981"             # Success green
+deliverable_bg = "#FEF3C7"      # Light yellow/orange
+deliverable_border = "#F59E0B"  # Orange border
 
 # Typography
 [ui.typography]
@@ -190,10 +192,11 @@ global = """
 
 .deliverable-box {
     background-color: #FFF3E0;
-    border-left: 4px solid {warning};
+    border-left: 4px solid #F59E0B;
     padding: 15px;
     border-radius: 4px;
     margin-top: 12px;
+    color: #92400E
 }
 
 .role-header {
@@ -262,7 +265,7 @@ phase_block = """
 """
 
 deliverable_item = """
-<div style='background-color: #FFF3E0; border-left: 4px solid {warning}; padding: 15px; border-radius: 4px; margin-top: 12px;'>
+<div style='color: #92400E;background-color: #FFF3CF; border-left: 4px solid #F59E0B; padding: 15px; border-radius: 4px; margin-top: 12px;'>
     <strong>🎯 Deliverable:</strong> {deliverable}
 </div>
 """
