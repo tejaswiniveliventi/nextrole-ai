@@ -109,7 +109,7 @@ The tracker uses these operations:
 3. In Portal: Storage Account → Tables → Select `progress` table to inspect rows
 
 ### Local Development Errors
-**Fix**: Ensure `.env` file has the correct connection string, and you've run `pip install azure-storage-table`.
+**Fix**: Ensure `.env` file has the correct connection string, and you've run `pip install azure-data-tables`.
 
 ## Deployment Notes
 

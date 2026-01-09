@@ -1,2 +1,3 @@
 [server]
 maxUploadSize = 10
+#max_upload_mb = 10
