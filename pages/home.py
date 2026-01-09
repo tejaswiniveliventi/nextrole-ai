@@ -4,6 +4,7 @@ from config_loader import load_config
 from llm import create_career_agent
 from utils import extract_text_from_pdf
 from utils.style_builder import apply_styles, render_skill_badges, format_html_template
+from services.table_storage_tracker import get_progress_tracker
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,10 @@ config = load_config()
 
 def show_home():
     apply_styles()
+    
+    # Initialize or get user ID
+    if "user_id" not in st.session_state:
+        st.session_state["user_id"] = f"user_{hash(str(st.session_state.get('_client_state', '')))}"
     
     # Professional header
     col1, col2 = st.columns([3, 1])
@@ -23,6 +28,7 @@ def show_home():
     st.divider()
     
     agent = create_career_agent()
+    tracker = get_progress_tracker()
 
     # Input section with professional cards
     st.markdown("### 📋 Assessment Details")
@@ -162,6 +168,8 @@ def show_home():
                         key=f"select_{idx}",
                         use_container_width=True
                     ):
+                        # Track role selection in Cosmos DB
+                        tracker.save_role_selection(st.session_state["user_id"], role)
                         st.session_state["selected_role"] = role
                         st.switch_page("pages/study_plan.py")
 

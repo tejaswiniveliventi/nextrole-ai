@@ -3,6 +3,7 @@ import streamlit as st
 from config_loader import load_config
 from llm import create_career_agent
 from utils.style_builder import apply_styles, render_skill_badges, format_html_template
+from services.table_storage_tracker import get_progress_tracker
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,8 @@ def show_study_plan():
         return
 
     role = st.session_state["selected_role"]
+    tracker = get_progress_tracker()
+    user_id = st.session_state.get("user_id", "anonymous")
     
     # Professional header with role info
     colors = config.get("ui", {}).get("colors", {})
@@ -86,6 +89,44 @@ def show_study_plan():
                 <strong>🎯 Deliverable:</strong> {deliverable}
             </div>
             """, unsafe_allow_html=True)
+        
+        # Progress tracking UI
+        col1, col2, col3 = st.columns([2, 1, 1])
+        with col1:
+            completion_pct = st.slider(
+                f"Phase {idx} progress",
+                0, 100, 0,
+                key=f"phase_{idx}_progress",
+                label_visibility="collapsed"
+            )
+        
+        with col2:
+            hours = st.number_input(
+                f"Hours",
+                0, 1000, 0,
+                key=f"phase_{idx}_hours",
+                label_visibility="collapsed"
+            )
+        
+        with col3:
+            if st.button(
+                "✓ Mark Done" if completion_pct == 100 else "Save",
+                key=f"phase_{idx}_save",
+                use_container_width=True
+            ):
+                # Track phase progress
+                tracker.save_phase_progress(
+                    user_id,
+                    role.get("role"),
+                    idx,
+                    {
+                        "status": "completed" if completion_pct == 100 else "in_progress",
+                        "completion_percentage": completion_pct,
+                        "hours_spent": hours,
+                        "skills_learned": skills_targeted,
+                    }
+                )
+                st.success(f"Phase {idx} progress saved!")
         
         st.markdown("</div></div>", unsafe_allow_html=True)
     

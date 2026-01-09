@@ -20,7 +20,8 @@ st.set_page_config(
 
 home_page = st.Page("pages/home.py", title="Home")
 study_plan_page = st.Page("pages/study_plan.py", title="Study Plan")
+progress_page = st.Page("pages/progress.py", title="My Progress")
 
-navigation = st.navigation([home_page, study_plan_page])
+navigation = st.navigation([home_page, study_plan_page, progress_page])
 navigation.run()
 logger.info("Streamlit navigation started")

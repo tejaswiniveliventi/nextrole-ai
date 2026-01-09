@@ -3,3 +3,4 @@ openai
 python-dotenv
 pypdf
 tomli
+azure-storage-table
