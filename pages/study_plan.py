@@ -85,10 +85,12 @@ def show_study_plan():
         deliverable = phase.get("deliverable")
         if deliverable:
             st.markdown(f"""
-            <div style='background-color: #FFF3E0; border-left: 4px solid {colors.get("warning", "#F59E0B")}; padding: 15px; border-radius: 4px; margin-top: 12px;'>
-                <strong>🎯 Deliverable:</strong> {deliverable}
-            </div>
-            """, unsafe_allow_html=True)
+    <div style='color: #92400E;background-color: {colors.get("deliverable_bg", "#FFF3E0")}; 
+                border-left: 4px solid {colors.get("deliverable_border", "#F59E0B")}; 
+                padding: 15px; border-radius: 4px; margin-top: 12px;'>
+        <strong>🎯 Deliverable:</strong> {deliverable}
+    </div>
+    """, unsafe_allow_html=True)
         
         # Progress tracking UI
         col1, col2, col3 = st.columns([2, 1, 1])
