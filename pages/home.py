@@ -53,30 +53,13 @@ def show_home():
         )
     
     with col2:
-        st.markdown(format_html_template("input_label_template", label=config['ui']['experience_level_label']), unsafe_allow_html=True)
-        experience_level = st.selectbox(
+        st.markdown(format_html_template("input_label_template", label=config['ui']['career_goal_label']), unsafe_allow_html=True)
+        career_goal = st.text_input(
             label="",
-            options=["student", "entry", "mid", "senior"],
-            index=1,
+            placeholder="e.g., Transition to Data Science",
             label_visibility="collapsed",
-            key="experience_level"
+            key="career_goal_input"
         )
-        
-        st.markdown(format_html_template("input_label_template", label=config['ui']['current_role_label']), unsafe_allow_html=True)
-        current_role = st.text_input(
-            label="",
-            placeholder="e.g., Software Engineer, Product Manager",
-            label_visibility="collapsed",
-            key="current_role_input"
-        )
-    
-    st.markdown(format_html_template("input_label_template", label=config['ui']['career_goal_label']), unsafe_allow_html=True)
-    career_goal = st.text_input(
-        label="",
-        placeholder="e.g., Transition to Data Science",
-        label_visibility="collapsed",
-        key="career_goal_input"
-    )
 
     # Normalize skills into a list and persist in session state across reruns
     skills = st.session_state.get("skills", [])
@@ -85,11 +68,15 @@ def show_home():
         with st.spinner(config["ui"]["extracting_skills_text"]):
             resume_text = extract_text_from_pdf(uploaded_file)
             extracted = agent.llm.extract_skills(resume_text)
-           
-            if isinstance(extracted, list):
-                skills = extracted
-            elif isinstance(extracted, str) and extracted:
-                skills = [s.strip() for s in extracted.split(",") if s.strip()]
+           # if isinstance(extracted, list):
+            #    st.write("inhereited list:", extracted)  # Debug line
+             #   skills = extracted["skills"]
+              #  current_role = extracted["current_role", ""]
+               # experience_level = extracted["experience_level", ""]
+            #elif isinstance(extracted["skills"], str) and extracted:
+            skills = extracted["skills"]#[s.strip() for s in extracted["skills"].split(",") if s.strip()]
+            current_role = extracted["current_role"]
+            experience_level = extracted["experience_level"]
             logger.info("Skills extracted from uploaded resume: %s", skills)
             # update persisted skills immediately
             if skills:
